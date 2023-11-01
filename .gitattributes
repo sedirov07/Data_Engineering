@@ -1,2 +1,0 @@
-/path/to/COVID-19_Reported.csv filter=lfs diff=lfs merge=lfs -text
-Practice2/task5/COVID-19_Reported.csv filter=lfs diff=lfs merge=lfs -text
