@@ -97,7 +97,7 @@ data_base = connect_to_db(r"..\first")
 # insert_data(data_base, buildings)
 
 
-# 1) Cортировкf по числу просмотров
+# 1) Cортировка по числу просмотров
 top_by_views = get_top_by_views(data_base)
 save_in_json(top_by_views, "result_sorted_by_views_22")
 
@@ -109,6 +109,6 @@ save_in_json(stat_by_prob_price, "result_stat_by_prob_price_22")
 freq_by_floors = get_freq_by_floors(data_base)
 save_in_json(freq_by_floors, "result_freq_by_floors_22")
 
-# 4) Фильтрация по году (от 1900 и позже)
+# 4) Фильтрация по году (от 1900 и позже) и сортировка по стоимости
 filter_by_year = get_filter_by_year(data_base, 1900)
 save_in_json(filter_by_year, "result_filter_by_year_22")

@@ -19,12 +19,39 @@ CREATE TABLE buildings (
 """
 CREATE TABLE comments (
     id            INTEGER    PRIMARY KEY AUTOINCREMENT,
-    building_id              REFERENCES buildings (id),
+    building_id   INTEGER    REFERENCES buildings (id),
     rating        REAL,
     convenience   INTEGER,
     security      INTEGER,
     functionality INTEGER,
     comment_text   TEXT (256) 
+);
+"""
+
+"""
+CREATE TABLE music (
+    id               INTEGER    PRIMARY KEY AUTOINCREMENT,
+    artist           TEXT (256),
+    song             TEXT (256),
+    duration_ms      INTEGER,
+    year             INTEGER,
+    tempo            REAL,
+    genre            TEXT (256),
+    instrumentalness REAL
+);
+"""
+
+"""
+CREATE TABLE products (
+    id          INTEGER    PRIMARY KEY AUTOINCREMENT,
+    name        TEXT (255),
+    price       REAL,
+    quantity    INTEGER,
+    category    TEXT (255),
+    fromCity    TEXT (255),
+    isAvailable TEXT (255),
+    views       INTEGER,
+    version     INTEGER    DEFAULT (0) 
 );
 """
 
