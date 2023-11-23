@@ -61,42 +61,38 @@ def delete_by_name(db, name):
     db.commit()
 
 
-def price_percent_by_name(db, name, percent):
+def update_price_percent_by_name(db, name, percent):
     cursor = db.cursor()
     cursor.execute("UPDATE products SET price = price * (1 + ?) WHERE name = ?", [percent, name])
     cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
     db.commit()
 
 
-def price_abs_by_name(db, name, num):
+def update_price_abs_by_name(db, name, num):
     cursor = db.cursor()
-    cursor.execute("""
+    res = cursor.execute("""
         UPDATE products
         SET price = price + ?
-        WHERE name = ? AND price + ? >= 0
+        WHERE name = ? AND (price + ?) >= 0
         """, [num, name, num])
-    cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
-
-
-def quantity_add_by_name(db, name, quantity):
-    cursor = db.cursor()
-    cursor.execute("UPDATE products SET quantity = quantity + ? WHERE name = ?", [quantity, name])
-    cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
+    if res.rowcount > 1:
+        cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
     db.commit()
 
 
-def quantity_sub_by_name(db, name, quantity):
+def update_quantity_by_name(db, name, quantity):
     cursor = db.cursor()
-    cursor.execute("""
+    res = cursor.execute("""
         UPDATE products
-        SET quantity = quantity - ?
-        WHERE name = ? AND quantity >= ?
+        SET quantity = (quantity + ?)
+        WHERE name = ? AND (quantity + ?) >= 0
         """, [quantity, name, quantity])
-    cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
+    if res.rowcount > 1:
+        cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
     db.commit()
 
 
-def available_change_by_name(db, name, available):
+def update_available_by_name(db, name, available):
     cursor = db.cursor()
     cursor.execute("UPDATE products SET isAvailable = ? WHERE name = ?", [available, name])
     cursor.execute("UPDATE products SET version = version + 1 WHERE name = ?", [name])
@@ -109,13 +105,15 @@ def handle_update(db, update_items):
             case 'remove':
                 delete_by_name(db, item['name'])
             case 'price_percent':
-                price_percent_by_name(db, item['name'], item['param'])
+                update_price_percent_by_name(db, item['name'], item['param'])
+            case 'price_abs':
+                update_price_abs_by_name(db, item['name'], item['param'])
             case 'quantity_add':
-                quantity_add_by_name(db, item['name'], item['param'])
-            case 'available':
-                available_change_by_name(db, item['name'], item['param'])
+                update_quantity_by_name(db, item['name'], item['param'])
             case 'quantity_sub':
-                quantity_sub_by_name(db, item['name'], item['param'])
+                update_quantity_by_name(db, item['name'], item['param'])
+            case 'available':
+                update_available_by_name(db, item['name'], item['param'])
 
 
 def get_top_by_update(db):
@@ -180,8 +178,8 @@ data_update_msg = parse_data_msg('task_4_var_22_update_data.msgpack')
 
 data_base = connect_to_db(r"..\fourth")
 
-# insert_data(data_base, data_text)
-# handle_update(data_base, data_update_msg)
+insert_data(data_base, data_text)
+handle_update(data_base, data_update_msg)
 
 # 1) Cортировка по году (от самого нового)
 top_by_update = get_top_by_update(data_base)
