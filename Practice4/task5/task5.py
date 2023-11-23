@@ -1,5 +1,6 @@
 import csv
 import json
+from Practice4.data_json import save_in_json
 from Practice4.create_db import connect_to_db
 
 
@@ -205,19 +206,39 @@ def get_freq_shipments_by_ship_service_level(db):
     return items
 
 
-data_json = load_data_json('Amazon Sale Report.json')  # Отчет о проданных товарах на площадке Амазон
-data_csv = load_data_csv('Amazon Sale Report.csv')  # Отчет о проданных товарах на площадке Амазон
-data_base = connect_to_db(r'../fiveth')
-data = data_csv + data_json
+data_json = load_data_json('Amazon Sale Report.json')  # Отчет о проданных товарах на площадке Амазон в json
+data_csv = load_data_csv('Amazon Sale Report.csv')  # Отчет о проданных товарах на площадке Амазон в csv
+data = data_csv + data_json  # Объединение данных отчетов
+data_base = connect_to_db(r'../fiveth')  # База данных sqlite
 
-# insert_data_orders(data_base, data)
-# insert_data_products(data_base, data)
-# insert_data_shipment(data_base, data)
+# insert_data_orders(data_base, data)  # вставка данных заказов в таблицу orders
+# insert_data_products(data_base, data)  # вставка данных продуктов в таблицу products
+# insert_data_shipment(data_base, data)  # вставка данных доставок в таблицу shipment
 
+# Первые 30 продуктов, у которых минимальное количество товаров = 2, отсортированные по стоимости
 top_products_by_amount = get_top_products_by_amount(data_base, 2, 30)
+# Сохранение в json
+save_in_json(top_products_by_amount, 'top_products_by_amount')
+
+# Первые 4 доставки B2B и первые 4 доставки не B2B (сортировка по id)
 groups_b2b_shipments = get_groups_b2b_shipments(data_base, 4)
+save_in_json(groups_b2b_shipments, 'groups_b2b_shipments')
+
+# Статистика цен заказов, сгрупированных по стране доставки
 stat_orders_by_amount = get_stat_orders_by_amount(data_base)
+save_in_json(stat_orders_by_amount, 'stat_orders_by_amount')
+
+# Статистика цен продуктов, сгрупированных по количеству этих продуктов в заказе
 stat_products_by_amount = get_stat_products_by_amount(data_base)
-update_shipment_courier_status(data_base, '407-5443024-5233168', 'Shipped')
+save_in_json(stat_products_by_amount, 'stat_products_by_amount')
+
+# Частота встречаемости и общее количество каждого размера продукта
 freq_products_by_size = get_freq_products_by_size(data_base)
+save_in_json(freq_products_by_size, 'freq_products_by_size')
+
+# Частота встречаемости и общее количество каждого из уровней сервиса доставки
 freq_shipments_by_ship_service_level = get_freq_shipments_by_ship_service_level(data_base)
+save_in_json(freq_shipments_by_ship_service_level, 'freq_shipments_by_ship_service_level')
+
+# Обновление статуса доставки на 'Доставлено'
+update_shipment_courier_status(data_base, '407-5443024-5233168', 'Shipped')
