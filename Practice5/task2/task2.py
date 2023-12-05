@@ -1,16 +1,6 @@
 import pickle
-from pymongo import MongoClient
 from Practice4.data_json import save_in_json
-
-
-def connect_mongo():
-    client = MongoClient()
-    db = client['test-db']
-    return db.person
-
-
-def insert_many(collection, data):
-    collection.insert_many(data)
+from Practice5.mongo_default import connect_mongo, insert_many
 
 
 def get_stats_by_salary(collection):
